@@ -1,9 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:go_router/go_router.dart';
-import 'package:social_mate_app/core/di/di.dart';
-import 'package:social_mate_app/core/routes/app_paths.dart';
-import 'package:social_mate_app/core/services/toast_service.dart';
 class MessageButton extends StatefulWidget {
   final String userId;
   final double? width;
