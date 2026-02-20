@@ -75,4 +75,59 @@ class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
       rethrow;
     }
   }
+
+  @override
+  Stream<NotificationModel> get notificationStream {
+    // ignore: close_sinks
+    final controller = StreamController<NotificationModel>();
+    final userId = _supabaseClient.auth.currentUser?.id;
+
+    if (userId == null) {
+      return const Stream.empty();
+    }
+
+    final channel = _supabaseClient.channel('public:notifications:$userId');
+
+    channel
+        .onPostgresChanges(
+          event: PostgresChangeEvent.update,
+          schema: 'public',
+          table: 'notifications',
+          filter: PostgresChangeFilter(
+            type: PostgresChangeFilterType.eq,
+            column: 'user_id',
+            value: userId,
+          ),
+          callback: (payload) async {
+            final newRecord = payload.newRecord;
+            try {
+              // Fetch actor details
+              final actorId = newRecord['actor_id'];
+              final actorResponse = await _supabaseClient
+                  .from('users')
+                  .select('name, avatar_url')
+                  .eq('id', actorId)
+                  .single();
+
+              final fullData = Map<String, dynamic>.from(newRecord);
+              // Ensure we handle the nested structure expected by fromJson
+              fullData['users'] = actorResponse;
+
+              if (!controller.isClosed) {
+                controller.add(NotificationModel.fromJson(fullData));
+              }
+            } catch (e) {
+              debugPrint('Error processing notification: $e');
+            }
+          },
+        )
+        .subscribe();
+
+    controller.onCancel = () async {
+      await _supabaseClient.removeChannel(channel);
+      await controller.close();
+    };
+
+    return controller.stream;
+  }
 }

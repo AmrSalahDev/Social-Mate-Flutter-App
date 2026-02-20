@@ -31,19 +31,16 @@ class StoryItem extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
-    return InkWell(
+    return GestureDetector(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(12.r),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           DottedBorder(
             options: CircularDottedBorderOptions(
-              strokeWidth: 2,
+              strokeWidth: 3,
               padding: EdgeInsets.zero,
-              color: hasUpdate
-                  ? colorScheme.secondary
-                  : colorScheme.outlineVariant,
+              color: colorScheme.secondary,
             ),
             child: _buildStoryPreview(colorScheme, textTheme, isLoading),
           ),

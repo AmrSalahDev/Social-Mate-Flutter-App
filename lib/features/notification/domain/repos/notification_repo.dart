@@ -4,4 +4,5 @@ abstract class NotificationRepo {
   Future<List<NotificationEntity>> getNotifications();
   Future<void> markAsRead(String notificationId);
   Future<void> markAllAsRead();
+  Stream<NotificationEntity> get notificationStream;
 }

@@ -23,4 +23,8 @@ class NotificationRepoImpl implements NotificationRepo {
   Future<void> markAllAsRead() async {
     await _remoteDataSource.markAllAsRead();
   }
+
+  @override
+  Stream<NotificationEntity> get notificationStream =>
+      _remoteDataSource.notificationStream;
 }

@@ -29,49 +29,56 @@ class NotificationList extends StatelessWidget {
     final strings = AppStrings.of(context);
     final textTheme = Theme.of(context).textTheme;
 
-    return GroupedListView<NotificationEntity, String>(
-      elements: notifications,
-      groupBy: (notification) {
-        final now = DateTime.now();
-        final today = DateTime(now.year, now.month, now.day);
-        final yesterday = today.subtract(const Duration(days: 1));
-
-        final localDate = notification.createdAt.toLocal();
-
-        final date = DateTime(localDate.year, localDate.month, localDate.day);
-
-        if (date.isAtSameMomentAs(today)) return strings.today;
-        if (date.isAtSameMomentAs(yesterday)) return strings.yesterday;
-        return strings.earlier;
+    return RefreshIndicator(
+      onRefresh: () async {
+        context.read<NotificationBloc>().add(LoadNotificationsEvent());
       },
-      groupSeparatorBuilder: (String groupValue) => Align(
-        alignment: Alignment.topLeft,
-        child: Padding(
-          padding: EdgeInsets.symmetric(vertical: 8.h),
-          child: Text(
-            groupValue,
-            style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+      child: GroupedListView<NotificationEntity, String>(
+        elements: notifications,
+        groupBy: (notification) {
+          final now = DateTime.now();
+          final today = DateTime(now.year, now.month, now.day);
+          final yesterday = today.subtract(const Duration(days: 1));
+
+          final localDate = notification.createdAt.toLocal();
+
+          final date = DateTime(localDate.year, localDate.month, localDate.day);
+
+          if (date.isAtSameMomentAs(today)) return strings.today;
+          if (date.isAtSameMomentAs(yesterday)) return strings.yesterday;
+          return strings.earlier;
+        },
+        groupSeparatorBuilder: (String groupValue) => Align(
+          alignment: Alignment.topLeft,
+          child: Padding(
+            padding: EdgeInsets.symmetric(vertical: 8.h),
+            child: Text(
+              groupValue,
+              style: textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
           ),
         ),
-      ),
-      itemBuilder: (context, notification) => Padding(
-        padding: EdgeInsets.only(bottom: 12.h),
-        child: NotificationItem(
-          notification: notification,
-          onTap: () {
-            context.read<NotificationBloc>().add(
-              MarkAsReadEvent(notification.id),
-            );
-          },
-          onActionPressed: () {
-            _handleNotificationAction(context, notification);
-          },
+        itemBuilder: (context, notification) => Padding(
+          padding: EdgeInsets.only(bottom: 12.h),
+          child: NotificationItem(
+            notification: notification,
+            onTap: () {
+              context.read<NotificationBloc>().add(
+                MarkAsReadEvent(notification.id),
+              );
+            },
+            onActionPressed: () {
+              _handleNotificationAction(context, notification);
+            },
+          ),
         ),
+        useStickyGroupSeparators: false,
+        floatingHeader: false,
+        order: GroupedListOrder.DESC,
+        padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 16.w),
       ),
-      useStickyGroupSeparators: false,
-      floatingHeader: false,
-      order: GroupedListOrder.ASC,
-      padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 16.w),
     );
   }
 

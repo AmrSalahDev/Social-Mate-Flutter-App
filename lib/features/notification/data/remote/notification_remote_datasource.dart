@@ -4,4 +4,5 @@ abstract class NotificationRemoteDataSource {
   Future<List<NotificationModel>> getNotifications();
   Future<void> markAsRead(String notificationId);
   Future<void> markAllAsRead();
+  Stream<NotificationModel> get notificationStream;
 }

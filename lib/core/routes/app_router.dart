@@ -37,8 +37,10 @@ class GoRouterRefreshStream extends ChangeNotifier {
 }
 
 class AppRouter {
+  static GoRouter? _router;
+
   static GoRouter router({required AppFlowBloc appFlowBloc}) {
-    return GoRouter(
+    _router ??= GoRouter(
       refreshListenable: GoRouterRefreshStream(appFlowBloc.stream),
       initialLocation: AppPaths.home,
       redirect: (context, state) {
@@ -215,5 +217,13 @@ class AppRouter {
         ),
       ],
     );
+    return _router!;
+  }
+
+  static GoRouter get instance {
+    if (_router == null) {
+      throw Exception('Router not initialized. Call router() first.');
+    }
+    return _router!;
   }
 }

@@ -15,6 +15,10 @@ import 'package:injectable/injectable.dart' as _i526;
 import 'package:retry/retry.dart' as _i689;
 import 'package:social_mate_app/core/di/register_module.dart' as _i124;
 import 'package:social_mate_app/core/services/auth_listener.dart' as _i859;
+import 'package:social_mate_app/core/services/local_notification_service.dart'
+    as _i535;
+import 'package:social_mate_app/core/services/notification_listener_service.dart'
+    as _i33;
 import 'package:social_mate_app/core/services/toast_service.dart' as _i169;
 import 'package:social_mate_app/features/auth/bloc/auth_bloc.dart' as _i944;
 import 'package:social_mate_app/features/auth/data/remote/auth_remote_datasource.dart'
@@ -182,6 +186,9 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i454.SupabaseClient>(() => registerModule.supabaseClient);
     gh.lazySingleton<_i183.ImagePicker>(() => registerModule.imagePicker);
     gh.lazySingleton<_i689.RetryOptions>(() => registerModule.retryOptions);
+    gh.lazySingleton<_i535.LocalNotificationService>(
+      () => _i535.LocalNotificationService(),
+    );
     gh.lazySingleton<_i169.ToastService>(() => _i169.ToastService());
     gh.lazySingleton<_i954.StoryViewerRemoteDatasource>(
       () => _i852.StoryViewerRemoteDatasourceImpl(
@@ -332,6 +339,12 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i892.GetAuthorPostsUseCase>(),
       ),
     );
+    gh.lazySingleton<_i33.NotificationListenerService>(
+      () => _i33.NotificationListenerService(
+        gh<_i737.NotificationRepo>(),
+        gh<_i535.LocalNotificationService>(),
+      ),
+    );
     gh.factory<_i694.GetProfileUsecase>(
       () => _i694.GetProfileUsecase(gh<_i792.ProfileRepo>()),
     );
@@ -399,7 +412,6 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i297.PickDocumentUsecase>(),
       ),
     );
-    
     return this;
   }
 }

@@ -1,5 +1,4 @@
 import 'package:device_preview/device_preview.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
@@ -15,6 +14,9 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:social_mate_app/global/bloc/app_flow_bloc.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:talker_bloc_logger/talker_bloc_logger_observer.dart';
+import 'package:social_mate_app/core/services/local_notification_service.dart';
+
+import 'package:social_mate_app/core/services/notification_listener_service.dart';
 
 void main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
@@ -33,11 +35,15 @@ void main() async {
     anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
   );
 
+  await getIt<LocalNotificationService>().init();
+  getIt<NotificationListenerService>().init();
+
   runApp(
     BlocProvider.value(
       value: getIt<AppFlowBloc>(),
       child: DevicePreview(
-        enabled: !kReleaseMode,
+        //enabled: !kReleaseMode,
+        enabled: false,
         builder: (context) => const SocialMateApp(),
       ),
     ),
