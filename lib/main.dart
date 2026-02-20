@@ -41,7 +41,7 @@ void main() async {
         builder: (context) => const SocialMateApp(),
       ),
     ),
-  ); 
+  );
 }
 
 class SocialMateApp extends StatelessWidget {
@@ -65,9 +65,8 @@ class SocialMateApp extends StatelessWidget {
 
           return MediaQuery(
             data: mediaQuery.copyWith(
-              textScaler: mediaQuery.textScaler.clamp(
-                minScaleFactor: 1.0,
-                maxScaleFactor: 1.3,
+              textScaler: TextScaler.linear(
+                mediaQuery.textScaler.scale(1).clamp(1.0, 1.3),
               ),
             ),
             child: DevicePreview.appBuilder(
