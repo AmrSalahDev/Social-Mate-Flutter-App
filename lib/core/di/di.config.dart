@@ -12,6 +12,7 @@
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:image_picker/image_picker.dart' as _i183;
 import 'package:injectable/injectable.dart' as _i526;
+import 'package:logger/logger.dart' as _i974;
 import 'package:retry/retry.dart' as _i689;
 import 'package:social_mate_app/core/di/register_module.dart' as _i124;
 import 'package:social_mate_app/core/services/auth_listener.dart' as _i859;
@@ -192,6 +193,7 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i454.SupabaseClient>(() => registerModule.supabaseClient);
     gh.lazySingleton<_i183.ImagePicker>(() => registerModule.imagePicker);
     gh.lazySingleton<_i689.RetryOptions>(() => registerModule.retryOptions);
+    gh.lazySingleton<_i974.Logger>(() => registerModule.logger);
     gh.lazySingleton<_i535.LocalNotificationService>(
       () => _i535.LocalNotificationService(),
     );
@@ -207,6 +209,13 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i579.GalleryRepo>(
       () => _i925.GalleryRepoImpl(
         galleryLocalDataSource: gh<_i164.GalleryLocalDataSource>(),
+      ),
+    );
+    gh.lazySingleton<_i564.NotificationRemoteDataSource>(
+      () => _i93.NotificationRemoteDataSourceImpl(
+        gh<_i454.SupabaseClient>(),
+        gh<_i689.RetryOptions>(),
+        gh<_i974.Logger>(),
       ),
     );
     gh.lazySingleton<_i915.StoryRemoteDataSource>(
@@ -251,12 +260,6 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.lazySingleton<_i817.GetPostsUsecse>(
       () => _i817.GetPostsUsecse(gh<_i358.PostRepo>()),
-    );
-    gh.lazySingleton<_i564.NotificationRemoteDataSource>(
-      () => _i93.NotificationRemoteDataSourceImpl(
-        gh<_i454.SupabaseClient>(),
-        gh<_i689.RetryOptions>(),
-      ),
     );
     gh.lazySingleton<_i845.AppFlowBloc>(
       () => _i845.AppFlowBloc(gh<_i859.AuthListener>()),
@@ -352,6 +355,7 @@ extension GetItInjectableX on _i174.GetIt {
       () => _i33.NotificationListenerService(
         gh<_i737.NotificationRepo>(),
         gh<_i535.LocalNotificationService>(),
+        gh<_i974.Logger>(),
       ),
     );
     gh.lazySingleton<_i371.MarkAllAsReadUsecase>(

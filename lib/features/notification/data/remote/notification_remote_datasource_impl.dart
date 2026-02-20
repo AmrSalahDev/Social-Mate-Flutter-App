@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:flutter/material.dart';
 import 'package:injectable/injectable.dart';
+import 'package:logger/logger.dart';
 import 'package:retry/retry.dart';
 import 'package:social_mate_app/features/notification/data/models/notification_model.dart';
 import 'package:social_mate_app/features/notification/data/remote/notification_remote_datasource.dart';
@@ -12,8 +12,9 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
   final SupabaseClient _supabaseClient;
   final RetryOptions _retryOptions;
+  final Logger _logger;
 
-  NotificationRemoteDataSourceImpl(this._supabaseClient, this._retryOptions);
+  NotificationRemoteDataSourceImpl(this._supabaseClient, this._retryOptions, this._logger);
 
   @override
   Future<List<NotificationModel>> getNotifications() async {
@@ -29,7 +30,7 @@ class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
             .order('created_at', ascending: true),
         //.timeout(Duration(seconds: 15)),
         retryIf: (e) => e is TimeoutException || e is SocketException,
-        onRetry: (e) => debugPrint('Retrying getNotifications due to: $e'),
+        onRetry: (e) => _logger.d('Retrying getNotifications due to: $e'),
       );
 
       return response.map((json) => NotificationModel.fromJson(json)).toList();
@@ -48,7 +49,7 @@ class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
             .eq('id', notificationId),
         //.timeout(Duration(seconds: 15)),
         retryIf: (e) => e is TimeoutException || e is SocketException,
-        onRetry: (e) => debugPrint('Retrying markAsRead due to: $e'),
+        onRetry: (e) => _logger.d('Retrying markAsRead due to: $e'),
       );
     } catch (e) {
       rethrow;
@@ -69,7 +70,7 @@ class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
             .eq('is_read', false),
         //.timeout(Duration(seconds: 15)),
         retryIf: (e) => e is TimeoutException || e is SocketException,
-        onRetry: (e) => debugPrint('Retrying markAllAsRead due to: $e'),
+        onRetry: (e) => _logger.d('Retrying markAllAsRead due to: $e'),
       );
     } catch (e) {
       rethrow;
@@ -102,7 +103,7 @@ class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
             value: userId,
           ),
           callback: (payload) async {
-            debugPrint(
+            _logger.d(
               'Notification Stream: Received event: ${payload.eventType}',
             );
             final newRecord = payload.newRecord;
@@ -120,19 +121,19 @@ class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
                     .single(),
                 retryIf: (e) => e is TimeoutException || e is SocketException,
                 onRetry: (e) =>
-                    debugPrint('Retrying notification fetch due to: $e'),
+                    _logger.d('Retrying notification fetch due to: $e'),
               );
 
               if (!controller.isClosed) {
                 controller.add(NotificationModel.fromJson(response));
               }
             } catch (e) {
-              debugPrint('Error processing notification: $e');
+              _logger.d('Error processing notification: $e');
             }
           },
         )
         .subscribe((status, error) {
-          debugPrint('Notification Stream Status: $status, error: $error');
+          _logger.d('Notification Stream Status: $status, error: $error');
         });
 
     controller.onCancel = () {

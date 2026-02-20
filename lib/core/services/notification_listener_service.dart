@@ -1,9 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:flutter/material.dart';
-
 import 'package:injectable/injectable.dart';
+import 'package:logger/logger.dart';
 import 'package:social_mate_app/core/routes/app_paths.dart';
 import 'package:social_mate_app/core/routes/app_router.dart';
 import 'package:social_mate_app/core/services/local_notification_service.dart';
@@ -15,6 +14,7 @@ import 'package:social_mate_app/features/notification/domain/repos/notification_
 class NotificationListenerService {
   final NotificationRepo _notificationRepo;
   final LocalNotificationService _localNotificationService;
+  final Logger _logger;
   StreamSubscription<NotificationEntity>? _subscription;
   StreamSubscription<String?>? _clickSubscription;
   final Set<String> _shownNotificationIds = {};
@@ -22,12 +22,13 @@ class NotificationListenerService {
   NotificationListenerService(
     this._notificationRepo,
     this._localNotificationService,
+    this._logger,
   );
 
   void init() {
-    debugPrint('NotificationListenerService: Initializing...');
+    _logger.d('NotificationListenerService: Initializing...');
     _subscription = _notificationRepo.notificationStream.listen((notification) {
-      debugPrint(
+      _logger.d(
         'NotificationListenerService: Received notification: ${notification.id}',
       );
       _showNotification(notification);
@@ -68,12 +69,12 @@ class NotificationListenerService {
   }
 
   Future<void> _showNotification(NotificationEntity notification) async {
-    debugPrint(
+    _logger.d(
       'NotificationListenerService: _showNotification called for ${notification.id}',
     );
     if (notification.isRead ||
         _shownNotificationIds.contains(notification.id)) {
-      debugPrint(
+      _logger.d(
         'NotificationListenerService: Skipping notification. isRead: ${notification.isRead}, already shown: ${_shownNotificationIds.contains(notification.id)}',
       );
       return;
@@ -112,7 +113,7 @@ class NotificationListenerService {
       }
     }
 
-    debugPrint(
+    _logger.d(
       'NotificationListenerService: Calling local notification service for ${notification.id}',
     );
     await _localNotificationService.showNotification(
@@ -126,7 +127,7 @@ class NotificationListenerService {
       }),
       largeIconPath: largeIconPath,
     );
-    debugPrint(
+    _logger.d(
       'NotificationListenerService: Local notification service call completed',
     );
   }
