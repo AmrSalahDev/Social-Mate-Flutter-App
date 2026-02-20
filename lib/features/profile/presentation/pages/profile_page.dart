@@ -102,7 +102,7 @@ class _ProfilePageState extends State<ProfilePage>
                                   24.verticalSpace,
                                 ],
                                 if (widget.userId != null) ...[
-                                  ProfileFollowButton(widget: widget),
+                                  ProfileFollowButton(userId: widget.userId!),
                                   16.verticalSpace,
                                 ],
                                 ProfileStats(profile: state.profile),

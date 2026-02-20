@@ -80,7 +80,7 @@ class PostWritingCard extends StatelessWidget {
                           strings.thinkingAboutToday,
                           strings.writeSomething,
                         ],
-                        hintTextStyle: textTheme.titleMedium?.copyWith(
+                        hintTextStyle: textTheme.titleSmall?.copyWith(
                           fontWeight: FontWeight.w400,
                           color: colorScheme.onSurfaceVariant.withValues(
                             alpha: 0.8,
@@ -112,8 +112,7 @@ class PostWritingCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8.r),
                 ),
                 child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  spacing: 4.w,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     _PostWritingCardActions(
                       path: Assets.icons.image.path,
@@ -163,19 +162,29 @@ class _PostWritingCardActions extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        SvgIcon(path: path, size: 24.w, color: colorScheme.secondary),
-        4.horizontalSpace,
-        Text(
-          '$label ${isLast == true ? '' : '| '}',
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: textTheme.bodyLarge?.copyWith(
-            color: colorScheme.onSurfaceVariant,
+    return FittedBox(
+      fit: BoxFit.scaleDown,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          SvgIcon(path: path, size: 24.w, color: colorScheme.secondary),
+          Text(
+            ' $label',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: textTheme.bodySmall?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+            ),
           ),
-        ),
-      ],
+          if (isLast != true) ...[
+            Text(
+              '  |  ',
+              style: textTheme.bodySmall?.copyWith(color: colorScheme.outline),
+            ),
+          ],
+        ],
+      ),
     );
   }
 }

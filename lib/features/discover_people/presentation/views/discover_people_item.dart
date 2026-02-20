@@ -20,6 +20,7 @@ class DiscoverPeopleItem extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
     final colorScheme = Theme.of(context).colorScheme;
     final strings = AppStrings.of(context);
+    
     final numberFormatter = createDisplay(
       decimal: 1,
       separator: ',',
@@ -68,18 +69,21 @@ class DiscoverPeopleItem extends StatelessWidget {
               ],
             ),
           ),
-          FollowButton(
-            userId: user.id,
-            isFollowing: user.isFollowing,
-            width: 100.w,
-            onFollow: () {
-              context.read<DiscoverPeopleBloc>().add(FollowUserEvent(user.id));
-            },
-            onUnfollow: () {
-              context.read<DiscoverPeopleBloc>().add(
-                UnfollowUserEvent(user.id),
-              );
-            },
+          Expanded(
+            child: FollowButton(
+              userId: user.id,
+              isFollowing: user.isFollowing,
+              onFollow: () {
+                context.read<DiscoverPeopleBloc>().add(
+                  FollowUserEvent(user.id),
+                );
+              },
+              onUnfollow: () {
+                context.read<DiscoverPeopleBloc>().add(
+                  UnfollowUserEvent(user.id),
+                );
+              },
+            ),
           ),
         ],
       ),

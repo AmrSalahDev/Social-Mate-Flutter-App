@@ -82,10 +82,12 @@ class _DiscoverPeoplePageState extends State<DiscoverPeoplePage>
                 );
               },
               child: ListView.builder(
-                key: const PageStorageKey('discover_people_scroll_key'), // Save scroll position because of when exit the page and come back it will be at the same position
+                key: const PageStorageKey(
+                  'discover_people_scroll_key',
+                ), // Save scroll position because of when exit the page and come back it will be at the same position
                 padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
                 itemCount: state.users.length,
-                itemExtent: 100.h,
+ 
                 itemBuilder: (context, index) {
                   return DiscoverPeopleItem(
                     key: ValueKey(state.users[index].id),

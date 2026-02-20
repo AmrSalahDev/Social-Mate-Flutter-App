@@ -1,3 +1,5 @@
+import 'package:device_preview/device_preview.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
@@ -34,9 +36,12 @@ void main() async {
   runApp(
     BlocProvider.value(
       value: getIt<AppFlowBloc>(),
-      child: const SocialMateApp(),
+      child: DevicePreview(
+        enabled: !kReleaseMode,
+        builder: (context) => const SocialMateApp(),
+      ),
     ),
-  );
+  ); 
 }
 
 class SocialMateApp extends StatelessWidget {
@@ -45,33 +50,50 @@ class SocialMateApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final appFlowBloc = context.read<AppFlowBloc>();
+
     return ScreenUtilInit(
       designSize: const Size(375, 812),
-      minTextAdapt: true,
       splitScreenMode: true,
       builder: (context, child) => MaterialApp.router(
         title: 'Social Mate',
         debugShowCheckedModeBanner: false,
+
+        locale: DevicePreview.locale(context),
+
+        builder: (context, child) {
+          final mediaQuery = MediaQuery.of(context);
+
+          return MediaQuery(
+            data: mediaQuery.copyWith(
+              textScaler: mediaQuery.textScaler.clamp(
+                minScaleFactor: 1.0,
+                maxScaleFactor: 1.3,
+              ),
+            ),
+            child: DevicePreview.appBuilder(
+              context,
+              SystemUIWrapper(
+                statusBarColor: Theme.of(context).colorScheme.surface,
+                statusBarIconBrightness: Brightness.dark,
+                navigationBarColor: Theme.of(context).colorScheme.surface,
+                navigationBarIconBrightness: Brightness.dark,
+                child: child!,
+              ),
+            ),
+          );
+        },
+
         routerConfig: AppRouter.router(appFlowBloc: appFlowBloc),
         theme: createLightTheme(lightTextTheme()),
         themeMode: ThemeMode.light,
-        localizationsDelegates: [
+
+        localizationsDelegates: const [
           AppStrings.delegate,
           GlobalMaterialLocalizations.delegate,
           GlobalWidgetsLocalizations.delegate,
           GlobalCupertinoLocalizations.delegate,
         ],
         supportedLocales: AppStrings.delegate.supportedLocales,
-        builder: (context, child) {
-          final colorScheme = Theme.of(context).colorScheme;
-          return SystemUIWrapper(
-            statusBarColor: colorScheme.surface,
-            statusBarIconBrightness: Brightness.dark,
-            navigationBarColor: colorScheme.surface,
-            navigationBarIconBrightness: Brightness.dark,
-            child: child!,
-          );
-        },
       ),
     );
   }

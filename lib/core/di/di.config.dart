@@ -137,8 +137,16 @@ import 'package:social_mate_app/features/inbox/domain/repos/inbox_repository.dar
     as _i182;
 import 'package:social_mate_app/features/inbox/domain/usecases/delete_chat_room_usecase.dart'
     as _i44;
+import 'package:social_mate_app/features/inbox/domain/usecases/get_or_create_chat_room_usecase.dart'
+    as _i23;
+import 'package:social_mate_app/features/inbox/domain/usecases/send_message_usecase.dart'
+    as _i300;
 import 'package:social_mate_app/features/inbox/domain/usecases/stream_chat_rooms_usecase.dart'
     as _i46;
+import 'package:social_mate_app/features/inbox/domain/usecases/stream_messages_usecase.dart'
+    as _i869;
+import 'package:social_mate_app/features/inbox/presentation/bloc/communication_bloc.dart'
+    as _i664;
 import 'package:social_mate_app/features/inbox/presentation/bloc/inbox_bloc.dart'
     as _i1024;
 import 'package:social_mate_app/features/notification/data/remote/notification_remote_datasource.dart'
@@ -323,26 +331,11 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i892.GetAuthorPostsUseCase>(
       () => _i892.GetAuthorPostsUseCase(gh<_i358.PostRepo>()),
     );
-    gh.lazySingleton<_i182.InboxRepository>(
-      () => _i1040.InboxRepositoryImpl(gh<_i762.InboxRemoteDataSource>()),
-    );
     gh.lazySingleton<_i792.ProfileRepo>(
       () => _i589.ProfileRepoImpl(gh<_i716.ProfileRemoteDatasource>()),
     );
     gh.factory<_i853.GalleryBloc>(
       () => _i853.GalleryBloc(getPhotosUsecase: gh<_i540.GetPhotosUsecase>()),
-    );
-    gh.lazySingleton<_i44.DeleteChatRoomUsecase>(
-      () => _i44.DeleteChatRoomUsecase(gh<_i182.InboxRepository>()),
-    );
-    gh.lazySingleton<_i46.StreamChatRoomsUsecase>(
-      () => _i46.StreamChatRoomsUsecase(gh<_i182.InboxRepository>()),
-    );
-    gh.factory<_i1024.InboxBloc>(
-      () => _i1024.InboxBloc(
-        gh<_i46.StreamChatRoomsUsecase>(),
-        gh<_i44.DeleteChatRoomUsecase>(),
-      ),
     );
     gh.lazySingleton<_i575.FollowUserUseCase>(
       () => _i575.FollowUserUseCase(gh<_i977.DiscoverPeopleRepo>()),
@@ -355,6 +348,12 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.lazySingleton<_i206.MediaPickerRepo>(
       () => _i842.MediaPickerRepoImpl(gh<_i498.MediaPickerLocalDataSource>()),
+    );
+    gh.lazySingleton<_i182.InboxRepository>(
+      () => _i1040.InboxRepositoryImpl(
+        gh<_i762.InboxRemoteDataSource>(),
+        gh<_i454.SupabaseClient>(),
+      ),
     );
     gh.factory<_i853.PostBloc>(
       () => _i853.PostBloc(
@@ -397,11 +396,32 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i241.TrackProfileViewUseCase>(
       () => _i241.TrackProfileViewUseCase(gh<_i792.ProfileRepo>()),
     );
+    gh.lazySingleton<_i23.GetOrCreateChatRoomUsecase>(
+      () => _i23.GetOrCreateChatRoomUsecase(gh<_i182.InboxRepository>()),
+    );
+    gh.lazySingleton<_i300.SendMessageUsecase>(
+      () => _i300.SendMessageUsecase(gh<_i182.InboxRepository>()),
+    );
+    gh.lazySingleton<_i869.StreamMessagesUsecase>(
+      () => _i869.StreamMessagesUsecase(gh<_i182.InboxRepository>()),
+    );
     gh.factory<_i419.DiscoverPeopleBloc>(
       () => _i419.DiscoverPeopleBloc(
         gh<_i69.GetSuggestedUsersUseCase>(),
         gh<_i575.FollowUserUseCase>(),
         gh<_i995.UnfollowUserUseCase>(),
+      ),
+    );
+    gh.lazySingleton<_i44.DeleteChatRoomUsecase>(
+      () => _i44.DeleteChatRoomUsecase(gh<_i182.InboxRepository>()),
+    );
+    gh.lazySingleton<_i46.StreamChatRoomsUsecase>(
+      () => _i46.StreamChatRoomsUsecase(gh<_i182.InboxRepository>()),
+    );
+    gh.factory<_i1024.InboxBloc>(
+      () => _i1024.InboxBloc(
+        gh<_i46.StreamChatRoomsUsecase>(),
+        gh<_i44.DeleteChatRoomUsecase>(),
       ),
     );
     gh.factory<_i200.StoryBloc>(
@@ -429,6 +449,12 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i1013.PickVideoFromCameraUsecase>(),
         gh<_i437.PickVideoFromGalleryUsecase>(),
         gh<_i297.PickDocumentUsecase>(),
+      ),
+    );
+    gh.factory<_i664.CommunicationBloc>(
+      () => _i664.CommunicationBloc(
+        gh<_i869.StreamMessagesUsecase>(),
+        gh<_i300.SendMessageUsecase>(),
       ),
     );
     return this;

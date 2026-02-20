@@ -36,7 +36,7 @@ class FollowButton extends StatelessWidget {
             : colorScheme.primary,
         foregroundColor: isFollowing ? Colors.grey : colorScheme.onPrimary,
         elevation: 0,
-        fixedSize: width != null ? Size(width!, 40.h) : null,
+        fixedSize: width != null ? Size(width!, 45.h) : null,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8.r),
           side: isFollowing
