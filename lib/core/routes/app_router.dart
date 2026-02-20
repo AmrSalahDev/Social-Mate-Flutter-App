@@ -79,7 +79,6 @@ class AppRouter {
           builder: (context, state, navigationShell) => MultiBlocProvider(
             providers: [
               BlocProvider(create: (context) => getIt<ProfileBloc>()),
-            
             ],
             child: BasePage(navigationShell: navigationShell),
           ),
@@ -95,7 +94,7 @@ class AppRouter {
                         create: (context) => getIt<StoryViewerBloc>(),
                       ),
                       BlocProvider(create: (context) => getIt<PostBloc>()),
-                        BlocProvider.value(value: getIt<NotificationBloc>()),
+                      BlocProvider.value(value: getIt<NotificationBloc>()),
                     ],
                     child: const HomePage(),
                   ),

@@ -1,10 +1,13 @@
 import 'dart:async';
+import 'package:flutter/material.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:injectable/injectable.dart';
 import 'package:social_mate_app/features/notification/domain/entities/notification_entity.dart';
 import 'package:social_mate_app/features/notification/domain/usecases/get_notifications_usecase.dart';
 import 'package:social_mate_app/features/notification/domain/usecases/get_notification_stream_usecase.dart';
+import 'package:social_mate_app/features/notification/domain/usecases/mark_all_as_read_usecase.dart';
+import 'package:social_mate_app/features/notification/domain/usecases/mark_as_read_usecase.dart';
 
 part 'notification_event.dart';
 part 'notification_state.dart';
@@ -13,11 +16,15 @@ part 'notification_state.dart';
 class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
   final GetNotificationsUseCase _getNotificationsUseCase;
   final GetNotificationStreamUseCase _getNotificationStreamUseCase;
+  final MarkAllAsReadUsecase _markAllAsReadUsecase;
+  final MarkAsReadUseCase _markAsReadUseCase;
   StreamSubscription? _notificationSubscription;
 
   NotificationBloc(
     this._getNotificationsUseCase,
     this._getNotificationStreamUseCase,
+    this._markAllAsReadUsecase,
+    this._markAsReadUseCase,
   ) : super(NotificationInitial()) {
     on<LoadNotificationsEvent>(_onLoadNotifications);
     on<MarkAsReadEvent>(_onMarkAsRead);
@@ -42,9 +49,7 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
       ) {
         add(IncomingNotificationEvent(notification));
       });
-
-      add(MarkAllAsReadEvent());
-     } catch (e) {
+    } catch (e) {
       emit(NotificationError(message: e.toString()));
     }
   }
@@ -82,8 +87,9 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
     Emitter<NotificationState> emit,
   ) async {
     final currentState = state;
+
+    // Optimistic update
     if (currentState is NotificationLoaded) {
-      // Optimistic update
       final updatedNotifications = currentState.notifications.map((
         notification,
       ) {
@@ -95,6 +101,13 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
 
       emit(NotificationLoaded(notifications: updatedNotifications));
     }
+
+    // Database update
+    try {
+      await _markAsReadUseCase(event.notificationId);
+    } catch (e) {
+      debugPrint('NotificationBloc: Error marking as read: $e');
+    }
   }
 
   Future<void> _onMarkAllAsRead(
@@ -102,13 +115,23 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
     Emitter<NotificationState> emit,
   ) async {
     final currentState = state;
+
+    // Optimistic update: If data is already loaded in the UI, mark them all as read immediately
     if (currentState is NotificationLoaded) {
-      // Optimistic update
       final updatedNotifications = currentState.notifications
           .map((notification) => notification.copyWith(isRead: true))
           .toList();
-
       emit(NotificationLoaded(notifications: updatedNotifications));
+    }
+
+    //  Database update: Call the use case to update the remote database
+    try {
+      await _markAllAsReadUsecase();
+    } catch (e) {
+      debugPrint('NotificationBloc: Error marking all as read: $e');
+      // If we already optimistically moved to Loaded state or were already there,
+      // we might want to stay there unless the error is critical.
+      // But we shouldn't emit an error state that replaces the Loaded state unless it's a hard failure.
     }
   }
 

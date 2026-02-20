@@ -21,6 +21,7 @@ class _NotificationPageState extends State<NotificationPage> {
   void initState() {
     super.initState();
     context.read<NotificationBloc>().add(LoadNotificationsEvent());
+    context.read<NotificationBloc>().add(MarkAllAsReadEvent());
   }
 
   @override

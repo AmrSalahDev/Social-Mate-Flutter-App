@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
+
 import 'package:injectable/injectable.dart';
 import 'package:social_mate_app/core/routes/app_paths.dart';
 import 'package:social_mate_app/core/routes/app_router.dart';
@@ -15,6 +17,7 @@ class NotificationListenerService {
   final LocalNotificationService _localNotificationService;
   StreamSubscription<NotificationEntity>? _subscription;
   StreamSubscription<String?>? _clickSubscription;
+  final Set<String> _shownNotificationIds = {};
 
   NotificationListenerService(
     this._notificationRepo,
@@ -22,7 +25,11 @@ class NotificationListenerService {
   );
 
   void init() {
+    debugPrint('NotificationListenerService: Initializing...');
     _subscription = _notificationRepo.notificationStream.listen((notification) {
+      debugPrint(
+        'NotificationListenerService: Received notification: ${notification.id}',
+      );
       _showNotification(notification);
     });
 
@@ -61,6 +68,18 @@ class NotificationListenerService {
   }
 
   Future<void> _showNotification(NotificationEntity notification) async {
+    debugPrint(
+      'NotificationListenerService: _showNotification called for ${notification.id}',
+    );
+    if (notification.isRead ||
+        _shownNotificationIds.contains(notification.id)) {
+      debugPrint(
+        'NotificationListenerService: Skipping notification. isRead: ${notification.isRead}, already shown: ${_shownNotificationIds.contains(notification.id)}',
+      );
+      return;
+    }
+    _shownNotificationIds.add(notification.id);
+
     String title = 'Social Mate';
     String body = notification.content;
 
@@ -93,6 +112,9 @@ class NotificationListenerService {
       }
     }
 
+    debugPrint(
+      'NotificationListenerService: Calling local notification service for ${notification.id}',
+    );
     await _localNotificationService.showNotification(
       id: notification.id.hashCode,
       title: title,
@@ -103,6 +125,9 @@ class NotificationListenerService {
         'actorId': notification.actorId,
       }),
       largeIconPath: largeIconPath,
+    );
+    debugPrint(
+      'NotificationListenerService: Local notification service call completed',
     );
   }
 

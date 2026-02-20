@@ -27,8 +27,11 @@ class _HomePageState extends State<HomePage>
   @override
   void initState() {
     super.initState();
-    context.read<NotificationBloc>().add(LoadNotificationsEvent());
-    
+    final notificationBloc = context.read<NotificationBloc>();
+    if (notificationBloc.state is! NotificationLoaded) {
+      notificationBloc.add(LoadNotificationsEvent());
+    }
+
     final profileBloc = context.read<ProfileBloc>();
     if (profileBloc.state is! ProfileLoaded) {
       profileBloc.add(GetProfileEvent());

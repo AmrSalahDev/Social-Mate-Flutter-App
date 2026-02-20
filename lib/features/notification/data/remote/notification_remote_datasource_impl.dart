@@ -76,9 +76,13 @@ class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
     }
   }
 
+  Stream<NotificationModel>? _sharedNotificationStream;
+
   @override
   Stream<NotificationModel> get notificationStream {
-    final controller = StreamController<NotificationModel>();
+    if (_sharedNotificationStream != null) return _sharedNotificationStream!;
+
+    final controller = StreamController<NotificationModel>.broadcast();
     final userId = _supabaseClient.auth.currentUser?.id;
 
     if (userId == null) {
@@ -98,7 +102,11 @@ class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
             value: userId,
           ),
           callback: (payload) async {
+            debugPrint(
+              'Notification Stream: Received event: ${payload.eventType}',
+            );
             final newRecord = payload.newRecord;
+            if (newRecord.isEmpty) return;
 
             try {
               // Fetch notification with actor details
@@ -123,13 +131,19 @@ class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
             }
           },
         )
-        .subscribe();
+        .subscribe((status, error) {
+          debugPrint('Notification Stream Status: $status, error: $error');
+        });
 
-    controller.onCancel = () async {
-      await _supabaseClient.removeChannel(channel);
-      await controller.close();
+    controller.onCancel = () {
+      if (!controller.hasListener) {
+        _supabaseClient.removeChannel(channel);
+        _sharedNotificationStream = null;
+        controller.close();
+      }
     };
 
-    return controller.stream;
+    _sharedNotificationStream = controller.stream;
+    return _sharedNotificationStream!;
   }
 }

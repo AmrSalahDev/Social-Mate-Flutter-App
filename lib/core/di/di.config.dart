@@ -143,6 +143,10 @@ import 'package:social_mate_app/features/notification/domain/usecases/get_notifi
     as _i376;
 import 'package:social_mate_app/features/notification/domain/usecases/get_notifications_usecase.dart'
     as _i516;
+import 'package:social_mate_app/features/notification/domain/usecases/mark_all_as_read_usecase.dart'
+    as _i371;
+import 'package:social_mate_app/features/notification/domain/usecases/mark_as_read_usecase.dart'
+    as _i792;
 import 'package:social_mate_app/features/notification/presentation/bloc/notification_bloc.dart'
     as _i834;
 import 'package:social_mate_app/features/profile/data/remote/profile_remote_datasource.dart'
@@ -318,12 +322,6 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i892.GetAuthorPostsUseCase>(
       () => _i892.GetAuthorPostsUseCase(gh<_i358.PostRepo>()),
     );
-    gh.lazySingleton<_i834.NotificationBloc>(
-      () => _i834.NotificationBloc(
-        gh<_i516.GetNotificationsUseCase>(),
-        gh<_i376.GetNotificationStreamUseCase>(),
-      ),
-    );
     gh.lazySingleton<_i792.ProfileRepo>(
       () => _i589.ProfileRepoImpl(gh<_i716.ProfileRemoteDatasource>()),
     );
@@ -356,6 +354,12 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i535.LocalNotificationService>(),
       ),
     );
+    gh.lazySingleton<_i371.MarkAllAsReadUsecase>(
+      () => _i371.MarkAllAsReadUsecase(gh<_i737.NotificationRepo>()),
+    );
+    gh.lazySingleton<_i792.MarkAsReadUseCase>(
+      () => _i792.MarkAsReadUseCase(gh<_i737.NotificationRepo>()),
+    );
     gh.factory<_i694.GetProfileUsecase>(
       () => _i694.GetProfileUsecase(gh<_i792.ProfileRepo>()),
     );
@@ -367,6 +371,14 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.lazySingleton<_i580.GetStoriesUseCase>(
       () => _i580.GetStoriesUseCase(gh<_i590.StoryRepo>()),
+    );
+    gh.lazySingleton<_i834.NotificationBloc>(
+      () => _i834.NotificationBloc(
+        gh<_i516.GetNotificationsUseCase>(),
+        gh<_i376.GetNotificationStreamUseCase>(),
+        gh<_i371.MarkAllAsReadUsecase>(),
+        gh<_i792.MarkAsReadUseCase>(),
+      ),
     );
     gh.lazySingleton<_i297.PickDocumentUsecase>(
       () => _i297.PickDocumentUsecase(gh<_i206.MediaPickerRepo>()),
