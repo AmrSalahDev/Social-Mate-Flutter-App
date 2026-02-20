@@ -44,8 +44,8 @@ class ColorName {
   /// Color: #000000
   static const Color onBackground = Color(0xFF000000);
 
-  /// Color: #000000
-  static const Color onError = Color(0xFF000000);
+  /// Color: #FFFFFF
+  static const Color onError = Color(0xFFFFFFFF);
 
   /// Color: #FFFFFF
   static const Color onPrimary = Color(0xFFFFFFFF);

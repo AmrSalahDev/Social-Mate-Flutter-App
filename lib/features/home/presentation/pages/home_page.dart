@@ -9,6 +9,7 @@ import 'package:social_mate_app/features/home/presentation/views/post_writing_ca
 import 'package:social_mate_app/features/home/presentation/views/post_card.dart';
 import 'package:social_mate_app/features/home/presentation/views/shimmer_posts.dart';
 import 'package:social_mate_app/features/home/presentation/views/stories_section.dart';
+import 'package:social_mate_app/features/notification/presentation/bloc/notification_bloc.dart';
 import 'package:social_mate_app/features/profile/presentation/bloc/profile_bloc.dart';
 
 class HomePage extends StatefulWidget {
@@ -26,6 +27,8 @@ class _HomePageState extends State<HomePage>
   @override
   void initState() {
     super.initState();
+    context.read<NotificationBloc>().add(LoadNotificationsEvent());
+    
     final profileBloc = context.read<ProfileBloc>();
     if (profileBloc.state is! ProfileLoaded) {
       profileBloc.add(GetProfileEvent());
@@ -38,7 +41,6 @@ class _HomePageState extends State<HomePage>
     if (postBloc.state is! PostLoaded) {
       postBloc.add(GetPostsEvent());
     }
-    
   }
 
   @override
@@ -55,6 +57,7 @@ class _HomePageState extends State<HomePage>
           context.read<ProfileBloc>().add(GetProfileEvent());
           context.read<StoryBloc>().add(GetStoriesEvent());
           context.read<PostBloc>().add(GetPostsEvent());
+          context.read<NotificationBloc>().add(LoadNotificationsEvent());
         },
         child: CustomScrollView(
           slivers: [

@@ -15,7 +15,7 @@
     <color name="tertiary">#000000</color>
     <color name="onTertiary">#000000</color>
     <color name="onSurfaceVariant">#4E5558</color>
-    <color name="onError">#000000</color>
+    <color name="onError">#FFFFFF</color>
     <color name="shadow">#000000</color>
     <color name="offlineColor">#DE5753</color>
     <color name="onlineColor">#0CCC92</color>

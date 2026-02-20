@@ -139,6 +139,8 @@ import 'package:social_mate_app/features/notification/data/repos/notification_re
     as _i482;
 import 'package:social_mate_app/features/notification/domain/repos/notification_repo.dart'
     as _i737;
+import 'package:social_mate_app/features/notification/domain/usecases/get_notification_stream_usecase.dart'
+    as _i376;
 import 'package:social_mate_app/features/notification/domain/usecases/get_notifications_usecase.dart'
     as _i516;
 import 'package:social_mate_app/features/notification/presentation/bloc/notification_bloc.dart'
@@ -299,6 +301,9 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i424.SignUpUsecase>(
       () => _i424.SignUpUsecase(gh<_i358.AuthRepo>()),
     );
+    gh.lazySingleton<_i376.GetNotificationStreamUseCase>(
+      () => _i376.GetNotificationStreamUseCase(gh<_i737.NotificationRepo>()),
+    );
     gh.lazySingleton<_i516.GetNotificationsUseCase>(
       () => _i516.GetNotificationsUseCase(gh<_i737.NotificationRepo>()),
     );
@@ -312,6 +317,12 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.lazySingleton<_i892.GetAuthorPostsUseCase>(
       () => _i892.GetAuthorPostsUseCase(gh<_i358.PostRepo>()),
+    );
+    gh.lazySingleton<_i834.NotificationBloc>(
+      () => _i834.NotificationBloc(
+        gh<_i516.GetNotificationsUseCase>(),
+        gh<_i376.GetNotificationStreamUseCase>(),
+      ),
     );
     gh.lazySingleton<_i792.ProfileRepo>(
       () => _i589.ProfileRepoImpl(gh<_i716.ProfileRemoteDatasource>()),
@@ -371,9 +382,6 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.lazySingleton<_i437.PickVideoFromGalleryUsecase>(
       () => _i437.PickVideoFromGalleryUsecase(gh<_i206.MediaPickerRepo>()),
-    );
-    gh.factory<_i834.NotificationBloc>(
-      () => _i834.NotificationBloc(gh<_i516.GetNotificationsUseCase>()),
     );
     gh.lazySingleton<_i241.TrackProfileViewUseCase>(
       () => _i241.TrackProfileViewUseCase(gh<_i792.ProfileRepo>()),

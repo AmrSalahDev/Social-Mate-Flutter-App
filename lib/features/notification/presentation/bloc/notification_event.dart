@@ -19,3 +19,12 @@ final class MarkAsReadEvent extends NotificationEvent {
 }
 
 final class MarkAllAsReadEvent extends NotificationEvent {}
+
+final class IncomingNotificationEvent extends NotificationEvent {
+  final NotificationEntity notification;
+
+  const IncomingNotificationEvent(this.notification);
+
+  @override
+  List<Object> get props => [notification];
+}

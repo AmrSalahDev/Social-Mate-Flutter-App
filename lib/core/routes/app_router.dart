@@ -76,8 +76,11 @@ class AppRouter {
       },
       routes: [
         StatefulShellRoute.indexedStack(
-          builder: (context, state, navigationShell) => BlocProvider(
-            create: (context) => getIt<ProfileBloc>(),
+          builder: (context, state, navigationShell) => MultiBlocProvider(
+            providers: [
+              BlocProvider(create: (context) => getIt<ProfileBloc>()),
+            
+            ],
             child: BasePage(navigationShell: navigationShell),
           ),
           branches: [
@@ -92,6 +95,7 @@ class AppRouter {
                         create: (context) => getIt<StoryViewerBloc>(),
                       ),
                       BlocProvider(create: (context) => getIt<PostBloc>()),
+                        BlocProvider.value(value: getIt<NotificationBloc>()),
                     ],
                     child: const HomePage(),
                   ),
@@ -163,8 +167,8 @@ class AppRouter {
         ),
         GoRoute(
           path: AppPaths.notification,
-          builder: (context, state) => BlocProvider(
-            create: (context) => getIt<NotificationBloc>(),
+          builder: (context, state) => MultiBlocProvider(
+            providers: [BlocProvider.value(value: getIt<NotificationBloc>())],
             child: const NotificationPage(),
           ),
         ),
