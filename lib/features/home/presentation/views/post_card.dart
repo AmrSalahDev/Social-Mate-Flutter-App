@@ -15,6 +15,8 @@ import 'package:social_mate_app/features/home/presentation/views/post_video_play
 import 'package:social_mate_app/global/widgets/shimmer_avater.dart';
 import 'package:social_mate_app/global/widgets/shimmer_image.dart';
 import 'package:social_mate_app/global/widgets/svg_icon.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:social_mate_app/core/di/di.dart';
 
 class PostCard extends StatelessWidget {
   const PostCard({super.key, required this.post});
@@ -42,6 +44,11 @@ class PostCard extends StatelessWidget {
         children: [
           GestureDetector(
             onTap: () {
+              final supabase = getIt<SupabaseClient>();
+              if (post.user.id == supabase.auth.currentUser?.id) {
+                context.push(AppPaths.profile);
+                return;
+              }
               context.push('${AppPaths.profile}/${post.user.id}');
             },
             child: Row(

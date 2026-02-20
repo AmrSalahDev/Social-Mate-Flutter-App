@@ -26,7 +26,7 @@ class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
             .from('notifications')
             .select('* , users:actor_id(*)')
             .eq('user_id', userId)
-            .order('created_at', ascending: false),
+            .order('created_at', ascending: true),
         //.timeout(Duration(seconds: 15)),
         retryIf: (e) => e is TimeoutException || e is SocketException,
         onRetry: (e) => debugPrint('Retrying getNotifications due to: $e'),
@@ -78,7 +78,6 @@ class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
 
   @override
   Stream<NotificationModel> get notificationStream {
-    // ignore: close_sinks
     final controller = StreamController<NotificationModel>();
     final userId = _supabaseClient.auth.currentUser?.id;
 
@@ -100,21 +99,24 @@ class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
           ),
           callback: (payload) async {
             final newRecord = payload.newRecord;
-            try {
-              // Fetch actor details
-              final actorId = newRecord['actor_id'];
-              final actorResponse = await _supabaseClient
-                  .from('users')
-                  .select('name, avatar_url')
-                  .eq('id', actorId)
-                  .single();
 
-              final fullData = Map<String, dynamic>.from(newRecord);
-              // Ensure we handle the nested structure expected by fromJson
-              fullData['users'] = actorResponse;
+            try {
+              // Fetch notification with actor details
+              final notificationId = newRecord['id'];
+
+              final response = await _retryOptions.retry(
+                () => _supabaseClient
+                    .from('notifications')
+                    .select('*, users:actor_id(name, avatar_url)')
+                    .eq('id', notificationId)
+                    .single(),
+                retryIf: (e) => e is TimeoutException || e is SocketException,
+                onRetry: (e) =>
+                    debugPrint('Retrying notification fetch due to: $e'),
+              );
 
               if (!controller.isClosed) {
-                controller.add(NotificationModel.fromJson(fullData));
+                controller.add(NotificationModel.fromJson(response));
               }
             } catch (e) {
               debugPrint('Error processing notification: $e');
