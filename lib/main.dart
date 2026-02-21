@@ -13,6 +13,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:social_mate_app/core/theme/light_text_theme.dart';
 import 'package:social_mate_app/core/theme/light_theme.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:social_mate_app/firebase_options.dart';
 import 'package:social_mate_app/global/bloc/app_flow_bloc.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:talker_bloc_logger/talker_bloc_logger_observer.dart';
@@ -33,8 +34,10 @@ void main() async {
   await dotenv.load(fileName: ".env");
 
   // initialize firebase
-  await Firebase.initializeApp();
-  
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+);
+
   // initialize firebase messaging
   FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
 
@@ -47,7 +50,7 @@ void main() async {
   await getIt<LocalNotificationService>().init();
 
   // Initialize FcmService early to catch background/killed notification clicks
-  getIt<FcmService>().init();
+  //getIt<FcmService>().init(); AppFlowBloc will init it on login
 
   runApp(
     MultiBlocProvider(

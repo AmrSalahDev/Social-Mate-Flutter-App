@@ -187,9 +187,12 @@ Below is a list of key packages used in this Flutter project:
 - `flutter_dotenv: ^6.0.0` - Load environment variables from `.env` 🔐.
 - `equatable: ^2.0.5` - Simplify object equality comparisons ⚖️.
 - `photo_manager: ^3.8.3` - Handling local media assets with ease 📸.
+- `photo_manager_image_provider: ^2.2.0` - Image provider for photo_manager 🖼️.
 - `shared_preferences: ^2.3.5` - Persistent storage for simple data 💾.
 - `retry: ^3.1.2` - Utility for retrying failed operations 🔄.
 - `uuid: ^4.5.2` - Generate unique identifiers 🆔.
+- `firebase_core: ^3.13.0` - Firebase core plugin for Flutter ⚡.
+- `firebase_messaging: ^15.2.5` - Firebase Cloud Messaging plugin for Flutter 🔔.
 
 ### 🎨 UI & Assets
 
@@ -227,6 +230,10 @@ Below is a list of key packages used in this Flutter project:
 - `copy_with_extension: ^12.0.0` - Generate copyWith methods for classes 🧬.
 - `image: ^4.7.2` - Server and web friendly library for image processing 🖼️.
 - `flutter_cache_manager: ^3.4.1` - Generic cache manager for Flutter 🗄️.
+- `flutter_local_notifications: ^21.0.0-dev.1` - Local notifications for Flutter 🔔.
+- `logger: ^2.6.2` - Small and easy to use logger for Flutter 📝.
+- `extension: ^1.0.0` - Dart extension methods for common types 🛠️.
+- `injectable_generator: ^2.6.2` - Code generation for injectable 🏗️.
 
 ---
 

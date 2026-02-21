@@ -47,6 +47,7 @@ class AppFlowBloc extends Cubit<AppFlowState> {
         }
       }
     });
+    
     FlutterNativeSplash.remove();
   }
 
