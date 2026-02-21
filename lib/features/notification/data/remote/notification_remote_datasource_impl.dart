@@ -28,7 +28,7 @@ class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
             .select('* , users:actor_id(*)')
             .eq('user_id', userId)
             .order('created_at', ascending: true),
-        //.timeout(Duration(seconds: 15)),
+       
         retryIf: (e) => e is TimeoutException || e is SocketException,
         onRetry: (e) => _logger.d('Retrying getNotifications due to: $e'),
       );
@@ -47,7 +47,7 @@ class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
             .from('notifications')
             .update({'is_read': true})
             .eq('id', notificationId),
-        //.timeout(Duration(seconds: 15)),
+        
         retryIf: (e) => e is TimeoutException || e is SocketException,
         onRetry: (e) => _logger.d('Retrying markAsRead due to: $e'),
       );
@@ -68,7 +68,6 @@ class NotificationRemoteDataSourceImpl implements NotificationRemoteDataSource {
             .update({'is_read': true})
             .eq('user_id', userId)
             .eq('is_read', false),
-        //.timeout(Duration(seconds: 15)),
         retryIf: (e) => e is TimeoutException || e is SocketException,
         onRetry: (e) => _logger.d('Retrying markAllAsRead due to: $e'),
       );

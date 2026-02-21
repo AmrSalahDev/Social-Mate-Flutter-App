@@ -94,7 +94,7 @@ class AppRouter {
                         create: (context) => getIt<StoryViewerBloc>(),
                       ),
                       BlocProvider(create: (context) => getIt<PostBloc>()),
-                      BlocProvider.value(value: getIt<NotificationBloc>()),
+                      
                     ],
                     child: const HomePage(),
                   ),
@@ -166,10 +166,7 @@ class AppRouter {
         ),
         GoRoute(
           path: AppPaths.notification,
-          builder: (context, state) => MultiBlocProvider(
-            providers: [BlocProvider.value(value: getIt<NotificationBloc>())],
-            child: const NotificationPage(),
-          ),
+          builder: (context, state) => const NotificationPage(),
         ),
         GoRoute(
           path: AppPaths.onboarding,

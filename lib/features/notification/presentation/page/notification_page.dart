@@ -20,8 +20,13 @@ class _NotificationPageState extends State<NotificationPage> {
   @override
   void initState() {
     super.initState();
-    context.read<NotificationBloc>().add(LoadNotificationsEvent());
-    context.read<NotificationBloc>().add(MarkAllAsReadEvent());
+    final bloc = context.read<NotificationBloc>();
+    // Only load if we haven't loaded yet to avoid flickering and resetting unread count for the Home screen
+    if (bloc.state is! NotificationLoaded) {
+      bloc.add(LoadNotificationsEvent());
+    }
+    // Always mark as read when visiting the page
+    bloc.add(MarkAllAsReadEvent());
   }
 
   @override

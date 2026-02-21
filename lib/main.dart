@@ -1,4 +1,6 @@
 import 'package:device_preview/device_preview.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
@@ -14,9 +16,10 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:social_mate_app/global/bloc/app_flow_bloc.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:talker_bloc_logger/talker_bloc_logger_observer.dart';
+import 'package:social_mate_app/features/notification/presentation/bloc/notification_bloc.dart';
 import 'package:social_mate_app/core/services/local_notification_service.dart';
 
-import 'package:social_mate_app/core/services/notification_listener_service.dart';
+import 'package:social_mate_app/core/services/fcm_service.dart';
 
 void main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
@@ -29,6 +32,12 @@ void main() async {
   // load environment variables
   await dotenv.load(fileName: ".env");
 
+  // initialize firebase
+  await Firebase.initializeApp();
+  
+  // initialize firebase messaging
+  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+
   // initialize supabase
   await Supabase.initialize(
     url: dotenv.env['SUPABASE_URL']!,
@@ -36,11 +45,16 @@ void main() async {
   );
 
   await getIt<LocalNotificationService>().init();
-  getIt<NotificationListenerService>().init();
+
+  // Initialize FcmService early to catch background/killed notification clicks
+  getIt<FcmService>().init();
 
   runApp(
-    BlocProvider.value(
-      value: getIt<AppFlowBloc>(),
+    MultiBlocProvider(
+      providers: [
+        BlocProvider.value(value: getIt<AppFlowBloc>()),
+        BlocProvider.value(value: getIt<NotificationBloc>()),
+      ],
       child: DevicePreview(
         //enabled: !kReleaseMode,
         enabled: false,

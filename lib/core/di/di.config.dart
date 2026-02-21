@@ -16,6 +16,7 @@ import 'package:logger/logger.dart' as _i974;
 import 'package:retry/retry.dart' as _i689;
 import 'package:social_mate_app/core/di/register_module.dart' as _i124;
 import 'package:social_mate_app/core/services/auth_listener.dart' as _i859;
+import 'package:social_mate_app/core/services/fcm_service.dart' as _i738;
 import 'package:social_mate_app/core/services/local_notification_service.dart'
     as _i535;
 import 'package:social_mate_app/core/services/notification_listener_service.dart'
@@ -226,6 +227,12 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i250.AuthRemoteDataSource>(
       () => _i633.AuthRemoteDataSourceImpl(gh<_i454.SupabaseClient>()),
     );
+    gh.lazySingleton<_i33.NotificationListenerService>(
+      () => _i33.NotificationListenerService(
+        gh<_i535.LocalNotificationService>(),
+        gh<_i974.Logger>(),
+      ),
+    );
     gh.lazySingleton<_i531.PostLocalDatasource>(
       () => _i84.PostLocalDatasourceImpl(),
     );
@@ -261,9 +268,6 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i817.GetPostsUsecse>(
       () => _i817.GetPostsUsecse(gh<_i358.PostRepo>()),
     );
-    gh.lazySingleton<_i845.AppFlowBloc>(
-      () => _i845.AppFlowBloc(gh<_i859.AuthListener>()),
-    );
     gh.lazySingleton<_i716.ProfileRemoteDatasource>(
       () => _i1016.ProfileRemoteDatasourceImpl(
         gh<_i454.SupabaseClient>(),
@@ -273,6 +277,13 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i176.DiscoverPeopleRemoteDataSource>(
       () =>
           _i153.DiscoverPeopleRemoteDataSourceImpl(gh<_i454.SupabaseClient>()),
+    );
+    gh.lazySingleton<_i738.FcmService>(
+      () => _i738.FcmService(
+        gh<_i454.SupabaseClient>(),
+        gh<_i535.LocalNotificationService>(),
+        gh<_i974.Logger>(),
+      ),
     );
     gh.lazySingleton<_i80.CreatePostRepo>(
       () => _i971.CreatePostRepoImpl(gh<_i285.CreatePostRemoteDataSource>()),
@@ -298,6 +309,9 @@ extension GetItInjectableX on _i174.GetIt {
       () => _i444.StoryRepoImpl(
         storyRemoteDataSource: gh<_i915.StoryRemoteDataSource>(),
       ),
+    );
+    gh.lazySingleton<_i845.AppFlowBloc>(
+      () => _i845.AppFlowBloc(gh<_i859.AuthListener>(), gh<_i738.FcmService>()),
     );
     gh.lazySingleton<_i358.AuthRepo>(
       () => _i375.AuthRepoImpl(gh<_i250.AuthRemoteDataSource>()),
@@ -349,13 +363,6 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i854.ToggleLikeUsecase>(),
         gh<_i183.ToggleDislikeUsecase>(),
         gh<_i892.GetAuthorPostsUseCase>(),
-      ),
-    );
-    gh.lazySingleton<_i33.NotificationListenerService>(
-      () => _i33.NotificationListenerService(
-        gh<_i737.NotificationRepo>(),
-        gh<_i535.LocalNotificationService>(),
-        gh<_i974.Logger>(),
       ),
     );
     gh.lazySingleton<_i371.MarkAllAsReadUsecase>(

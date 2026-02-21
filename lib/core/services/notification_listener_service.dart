@@ -6,134 +6,132 @@ import 'package:logger/logger.dart';
 import 'package:social_mate_app/core/routes/app_paths.dart';
 import 'package:social_mate_app/core/routes/app_router.dart';
 import 'package:social_mate_app/core/services/local_notification_service.dart';
-import 'package:social_mate_app/core/services/media_cache_service.dart';
 import 'package:social_mate_app/features/notification/domain/entities/notification_entity.dart';
-import 'package:social_mate_app/features/notification/domain/repos/notification_repo.dart';
 
 @lazySingleton
 class NotificationListenerService {
-  final NotificationRepo _notificationRepo;
+  //final NotificationRepo _notificationRepo;
   final LocalNotificationService _localNotificationService;
   final Logger _logger;
-  StreamSubscription<NotificationEntity>? _subscription;
+  //StreamSubscription<NotificationEntity>? _subscription;
   StreamSubscription<String?>? _clickSubscription;
-  final Set<String> _shownNotificationIds = {};
+  //final Set<String> _shownNotificationIds = {};
 
   NotificationListenerService(
-    this._notificationRepo,
+    //this._notificationRepo,
     this._localNotificationService,
     this._logger,
   );
 
-  void init() {
-    _logger.d('NotificationListenerService: Initializing...');
-    _subscription = _notificationRepo.notificationStream.listen((notification) {
-      _logger.d(
-        'NotificationListenerService: Received notification: ${notification.id}',
-      );
-      _showNotification(notification);
-    });
+  // void init() {
+  //   _logger.d('NotificationListenerService: Initializing...');
+  //   // _subscription = _notificationRepo.notificationStream.listen((notification) {
+  //   //   _logger.d(
+  //   //     'NotificationListenerService: Received notification: ${notification.id}',
+  //   //   );
+  //   //   _showNotification(notification);
+  //   // });
 
-    _clickSubscription = _localNotificationService.onNotificationClick.listen((
-      payload,
-    ) {
-      if (payload != null) {
-        _handleNotificationClick(payload);
-      }
-    });
-  }
+  //   _clickSubscription = _localNotificationService.onNotificationClick.listen((
+  //     payload,
+  //   ) {
+  //     if (payload != null) {
+  //       _handleNotificationClick(payload);
+  //     }
+  //   });
+  // }
 
-  Future<void> _handleNotificationClick(String payload) async {
-    try {
-      final Map<String, dynamic> data = jsonDecode(payload);
-      final String type = data['type'];
-      final String actorId = data['actorId'];
+  // Future<void> _handleNotificationClick(String payload) async {
+  //   try {
+  //     final Map<String, dynamic> data = jsonDecode(payload);
+  //     final String type = data['type'];
+  //     final String actorId = data['actorId'];
 
-      if (type == NotificationType.follow.name ||
-          type == NotificationType.profileView.name) {
-        // Wait for router to be initialized if needed
-        int retries = 0;
-        while (retries < 10) {
-          try {
-            AppRouter.instance.push('${AppPaths.profile}/$actorId');
-            break;
-          } catch (e) {
-            await Future.delayed(const Duration(milliseconds: 500));
-            retries++;
-          }
-        }
-      }
-    } catch (e) {
-      // Ignore click error
-    }
-  }
+  //     if (type == NotificationType.follow.name ||
+  //         type == NotificationType.profileView.name) {
+  //       // Wait for router to be initialized if needed
+  //       int retries = 0;
+  //       while (retries < 10) {
+  //         try {
+  //           AppRouter.instance.push('${AppPaths.profile}/$actorId');
+  //           break;
+  //         } catch (e) {
+  //           await Future.delayed(const Duration(milliseconds: 500));
+  //           retries++;
+  //         }
+  //       }
+  //     }
+  //   } catch (e) {
+  //     // Ignore click error
+  //   }
+  // }
 
-  Future<void> _showNotification(NotificationEntity notification) async {
-    _logger.d(
-      'NotificationListenerService: _showNotification called for ${notification.id}',
-    );
-    if (notification.isRead ||
-        _shownNotificationIds.contains(notification.id)) {
-      _logger.d(
-        'NotificationListenerService: Skipping notification. isRead: ${notification.isRead}, already shown: ${_shownNotificationIds.contains(notification.id)}',
-      );
-      return;
-    }
-    _shownNotificationIds.add(notification.id);
+  // Future<void> _showNotification(NotificationEntity notification) async {
+  //   _logger.d(
+  //     'NotificationListenerService: _showNotification called for ${notification.id}',
+  //   );
+  //   if (notification.isRead ||
+  //       _shownNotificationIds.contains(notification.id)) {
+  //     _logger.d(
+  //       'NotificationListenerService: Skipping notification. isRead: ${notification.isRead}, already shown: ${_shownNotificationIds.contains(notification.id)}',
+  //     );
+  //     return;
+  //   }
+  //   _shownNotificationIds.add(notification.id);
 
-    String title = 'Social Mate';
-    String body = notification.content;
+  //   String title = 'Social Mate';
+  //   String body = notification.content;
 
-    switch (notification.type) {
-      case NotificationType.profileView:
-        title = 'Profile View';
-        body = '${notification.actorName} viewed your profile';
-        break;
-      case NotificationType.follow:
-        title = 'New Follower';
-        body = '${notification.actorName} started following you';
-        break;
-      case NotificationType.congratulation:
-        title = 'Congratulation';
-        break;
-      case NotificationType.event:
-        title = 'Event';
-        break;
-    }
+  //   switch (notification.type) {
+  //     case NotificationType.profileView:
+  //       title = 'Profile View';
+  //       body = '${notification.actorName} viewed your profile';
+  //       break;
+  //     case NotificationType.follow:
+  //       title = 'New Follower';
+  //       body = '${notification.actorName} started following you';
+  //       break;
+  //     case NotificationType.congratulation:
+  //       title = 'Congratulation';
+  //       break;
+  //     case NotificationType.event:
+  //       title = 'Event';
+  //       break;
+  //   }
 
-    String? largeIconPath;
-    if (notification.actorAvatar.isNotEmpty) {
-      try {
-        final file = await MediaCacheService.imageCache.getSingleFile(
-          notification.actorAvatar,
-        );
-        largeIconPath = file.path;
-      } catch (e) {
-        // Ignore image loading error
-      }
-    }
+  //   String? largeIconPath;
+  //   if (notification.actorAvatar.isNotEmpty) {
+  //     try {
+  //       final file = await MediaCacheService.imageCache.getSingleFile(
+  //         notification.actorAvatar,
+  //       );
+  //       largeIconPath = file.path;
+  //     } catch (e) {
+  //       // Ignore image loading error
+  //     }
+  //   }
 
-    _logger.d(
-      'NotificationListenerService: Calling local notification service for ${notification.id}',
-    );
-    await _localNotificationService.showNotification(
-      id: notification.id.hashCode,
-      title: title,
-      body: body,
-      payload: jsonEncode({
-        'id': notification.id,
-        'type': notification.type.name,
-        'actorId': notification.actorId,
-      }),
-      largeIconPath: largeIconPath,
-    );
-    _logger.d(
-      'NotificationListenerService: Local notification service call completed',
-    );
-  }
+  //   _logger.d(
+  //     'NotificationListenerService: Calling local notification service for ${notification.id}',
+  //   );
+  //   await _localNotificationService.showNotification(
+  //     id: notification.id.hashCode,
+  //     title: title,
+  //     body: body,
+  //     payload: jsonEncode({
+  //       'id': notification.id,
+  //       'type': notification.type.name,
+  //       'actorId': notification.actorId,
+  //     }),
+  //     largeIconPath: largeIconPath,
+  //   );
+  //   _logger.d(
+  //     'NotificationListenerService: Local notification service call completed',
+  //   );
+  // }
 
   void dispose() {
-    _subscription?.cancel();
+    //_subscription?.cancel();
     _clickSubscription?.cancel();
   }
 }

@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:injectable/injectable.dart';
-import 'package:timezone/data/latest_all.dart' as tz;
 
 @lazySingleton
 class LocalNotificationService {
@@ -12,12 +11,16 @@ class LocalNotificationService {
   final _onNotificationClick = StreamController<String?>.broadcast();
   Stream<String?> get onNotificationClick => _onNotificationClick.stream;
 
-  Future<void> init() async {
-    tz.initializeTimeZones();
+  void handleNotificationPayload(String? payload) {
+    if (payload != null) {
+      _onNotificationClick.add(payload);
+    }
+  }
 
+  Future<void> init() async {
     // Android initialization
     const AndroidInitializationSettings initializationSettingsAndroid =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
+        AndroidInitializationSettings('ic_notification');
 
     // iOS initialization
     const DarwinInitializationSettings initializationSettingsDarwin =
@@ -84,6 +87,8 @@ class LocalNotificationService {
           importance: Importance.max,
           priority: Priority.high,
           ticker: 'ticker',
+          showWhen: true,
+          when: DateTime.now().millisecondsSinceEpoch,
           largeIcon: largeIconPath != null
               ? FilePathAndroidBitmap(largeIconPath)
               : null,
