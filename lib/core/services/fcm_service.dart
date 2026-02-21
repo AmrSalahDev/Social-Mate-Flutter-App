@@ -60,6 +60,8 @@ class FcmService {
       _handleNotificationClick(message.data);
     });
 
+   
+
     // Handle clicks from Foreground notifications (local notifications)
     _localNotificationService.onNotificationClick.listen((payload) {
       if (payload != null) {
@@ -155,7 +157,7 @@ class FcmService {
         body: message.notification!.body ?? '',
         payload: jsonEncode(message.data),
       );
-    }
+    }  
   }
 }
 
